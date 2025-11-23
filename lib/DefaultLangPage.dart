@@ -43,7 +43,7 @@ class _DefaultlangpageState extends State<Defaultlangpage> {
                   ),
                   const SizedBox(height: 10),
                   const Text(
-                    "Shetkari",
+                    "Agriguard",
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,

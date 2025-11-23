@@ -77,7 +77,7 @@ class AppLocalizationsUr extends AppLocalizations {
   String get welcome_head => 'میں خوش آمدید';
 
   @override
-  String get shetkari => 'شیتکاری';
+  String get shetkari => 'ایگری گارڈ';
 
   @override
   String get descrp =>

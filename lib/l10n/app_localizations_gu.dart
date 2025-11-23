@@ -77,7 +77,7 @@ class AppLocalizationsGu extends AppLocalizations {
   String get welcome_head => 'આપનું સ્વાગત છે';
 
   @override
-  String get shetkari => 'શેતકરી માં';
+  String get shetkari => 'એગ્રીગાર્ડ';
 
   @override
   String get descrp =>

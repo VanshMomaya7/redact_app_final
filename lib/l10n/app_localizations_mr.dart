@@ -77,7 +77,7 @@ class AppLocalizationsMr extends AppLocalizations {
   String get welcome_head => 'मध्ये आपले स्वागत आहे';
 
   @override
-  String get shetkari => 'शेतकरी मध्ये';
+  String get shetkari => 'एग्रीगार्ड';
 
   @override
   String get descrp =>

@@ -241,7 +241,7 @@ abstract class AppLocalizations {
   /// No description provided for @shetkari.
   ///
   /// In en, this message translates to:
-  /// **'Shetkari'**
+  /// **'Agriguard'**
   String get shetkari;
 
   /// No description provided for @descrp.

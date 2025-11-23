@@ -48,7 +48,7 @@ class _HelppageState extends State<Helppage> {
                     fontFamily: "Mergeone"),
               ),
               subtitle: const Text(
-                '+91-987654321 | www.shetkari.com',
+                '+91-987654321 | www.agriguard.com',
                 style: TextStyle(fontSize: 15, fontFamily: "Mergeone"),
               ),
               onTap: () {

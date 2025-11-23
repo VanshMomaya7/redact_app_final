@@ -78,7 +78,7 @@ class AppLocalizationsTe extends AppLocalizations {
   String get welcome_head => 'కు స్వాగతం';
 
   @override
-  String get shetkari => 'షెట్కారి';
+  String get shetkari => 'అగ్రిగార్డ్';
 
   @override
   String get descrp =>

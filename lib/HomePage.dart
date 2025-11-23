@@ -121,20 +121,29 @@ class _HomePageState extends State<HomePage> {
                       const SizedBox(
                         height: 5,
                       ),
-                      Text(
-                        localizations.welcome_head,
-                        style: TextStyle(
-                            fontSize: 35,
-                            fontFamily: 'Merriweather',
-                            color: Colors.white),
+                      Flexible(
+                        child: Text(
+                          localizations.welcome_head,
+                          style: const TextStyle(
+                              fontSize: 28,
+                              fontFamily: 'Merriweather',
+                              color: Colors.white),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
                       ),
-                      Text(
-                        localizations.shetkari,
-                        style: TextStyle(
-                            fontSize: 65,
-                            fontFamily: 'Merriweather',
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                      Flexible(
+                        child: Text(
+                          localizations.shetkari,
+                          style: const TextStyle(
+                              fontSize: 48,
+                              fontFamily: 'Merriweather',
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                          overflow: TextOverflow.visible,
+                          softWrap: true,
+                          maxLines: 2,
+                        ),
                       ),
                       const SizedBox(
                         height: 10,

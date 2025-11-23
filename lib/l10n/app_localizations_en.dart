@@ -77,7 +77,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get welcome_head => 'Welcome to';
 
   @override
-  String get shetkari => 'Shetkari';
+  String get shetkari => 'Agriguard';
 
   @override
   String get descrp =>

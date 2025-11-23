@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:sih_shetkari/l10n/app_localizations.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
@@ -16,9 +17,11 @@ class _DiseaseDetectionState extends State<DiseaseDetection> {
   final ImagePicker _picker = ImagePicker();
   XFile? _image;
   String? _diseaseName;
+  String? _recommendations;
   bool _isLoading = false;
+  bool _showRecommendations = false;
 
-  final String baseUrl = 'https://crop-disease-detector-gg0o.onrender.com/';
+  final String apiUrl = 'https://vansh180-daksh159-plant-disease-api.hf.space/predict';
 
   Future<void> _pickImageFromCamera() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.camera);
@@ -44,46 +47,58 @@ class _DiseaseDetectionState extends State<DiseaseDetection> {
 
     setState(() {
       _isLoading = true;
+      _diseaseName = null;
     });
 
     try {
-      print("Uploading image...");
+      print("Sending image to blockchain-secured backend...");
 
-      final url = Uri.parse('$baseUrl/predict');
-      final request = http.MultipartRequest('POST', url);
-
-      // Update 'file' to the expected field name from the backend
-      request.files.add(await http.MultipartFile.fromPath(
-        'file', // Replace with the correct field name, e.g., 'image', 'photo'
-        _image!.path,
-      ));
-
-      // Add timeout of 30 seconds
-      final response = await request.send().timeout(
-        const Duration(seconds: 30),
-        onTimeout: () {
-          throw Exception('Request timed out. The server might be sleeping or unavailable.');
-        },
+      // Read bytes directly from XFile to avoid path issues
+      final bytes = await _image!.readAsBytes();
+      
+      final request = http.MultipartRequest(
+        'POST', 
+        Uri.parse('http://10.10.122.104:8000/verify-and-store')
       );
       
-      final responseData = await http.Response.fromStream(response);
+      request.files.add(
+        http.MultipartFile.fromBytes(
+          'file',
+          bytes,
+          filename: 'upload.jpg',
+        ),
+      );
+
+      final streamedResponse = await request.send();
+      final response = await http.Response.fromStream(streamedResponse);
 
       print("Response status: ${response.statusCode}");
-      print("Response body: ${responseData.body}");
+      print("Response body: ${response.body}");
 
       if (response.statusCode == 200) {
-        final jsonResponse = jsonDecode(responseData.body);
+        final jsonResponse = jsonDecode(response.body);
+        
+        final String prediction = jsonResponse['prediction'];
+        final double confidence = jsonResponse['confidence'];
+        final String pendingTx = jsonResponse['pending_tx'];
+        final String updateTx = jsonResponse['update_tx'];
+        final String recommendations = jsonResponse['recommendations'] ?? 'No recommendations available';
 
-        if (jsonResponse.containsKey('predicted_disease')) {
-          setState(() {
-            _diseaseName = jsonResponse['predicted_disease'];
-          });
-        } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Unexpected server response')),
-          );
-          print("Unexpected response format: ${responseData.body}");
-        }
+        setState(() {
+          _diseaseName = "$prediction (${(confidence * 100).toStringAsFixed(1)}%)\n\n" +
+                        "🔐 Blockchain Verified\n" +
+                        "📝 Hash: ${jsonResponse['hash'].substring(0, 16)}...\n" +
+                        "⛓️ TX: ${updateTx.substring(0, 16)}...";
+          _recommendations = recommendations;
+          _showRecommendations = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Image verified on blockchain!'),
+            backgroundColor: Colors.green,
+          ),
+        );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Server Error: ${response.statusCode}')),
@@ -93,9 +108,7 @@ class _DiseaseDetectionState extends State<DiseaseDetection> {
       print("Error occurred: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Error: ${e.toString().contains('timed out') 
-            ? 'Server is not responding. Please try again later.' 
-            : e.toString()}'),
+          content: Text('Error: $e'),
           duration: const Duration(seconds: 5),
         ),
       );
@@ -201,6 +214,61 @@ class _DiseaseDetectionState extends State<DiseaseDetection> {
                     fontFamily: "Merriweather",
                     fontWeight: FontWeight.bold,
                     color: Color.fromARGB(255, 2, 85, 56),
+                  ),
+                ),
+              ),
+            const SizedBox(height: 10),
+            // AI Recommendations Card
+            if (_recommendations != null)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(15),
+                  ),
+                  child: Column(
+                    children: [
+                      ListTile(
+                        leading: const Icon(Icons.psychology, color: Color(0xFF2A9F5D)),
+                        title: const Text(
+                          '🤖 AI Agricultural Recommendations',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        trailing: Icon(
+                          _showRecommendations
+                              ? Icons.expand_less
+                              : Icons.expand_more,
+                        ),
+                        onTap: () {
+                          setState(() {
+                            _showRecommendations = !_showRecommendations;
+                          });
+                        },
+                      ),
+                      if (_showRecommendations)
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.green.shade50,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              _recommendations!,
+                              style: const TextStyle(
+                                fontSize: 14,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
                   ),
                 ),
               ),
